@@ -9,6 +9,9 @@ import sheetReducer, {
   moveCellRight,
   moveCellUp,
   applyCell,
+  addColumns,
+  addRows,
+  copySelectedToInput,
 } from "./slices/sheetSlice";
 
 const store = configureStore({
@@ -27,4 +30,7 @@ export {
   moveCellRight,
   moveCellUp,
   applyCell,
+  addColumns,
+  addRows,
+  copySelectedToInput,
 };

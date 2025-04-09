@@ -12,7 +12,7 @@ interface Sheet {
 
 const generateInitialCells = () => {
   const cells: string[][] = [];
-  for (let i = 0; i < 26; i++) {
+  for (let i = 0; i < 50; i++) {
     const row: string[] = [];
     for (let j = 0; j < 26; j++) {
       row.push("");
@@ -89,6 +89,28 @@ const sheetSlice = createSlice({
         }
       }
     },
+    addColumns(state) {
+      let newCells: string[][] = state.cells;
+      for (let i = 0; i < newCells.length; i++) {
+        for (let j = 0; j < 5; j++) {
+          newCells[i].push("");
+        }
+      }
+      state.cells = newCells;
+    },
+    addRows(state) {
+      const newCells = state.cells;
+      for (let i = 0; i < 5; i++) {
+        newCells.push(Array(state.cells[0].length).fill(""));
+      }
+      state.cells = newCells;
+    },
+    copySelectedToInput(state) {
+      if (state.selectedCell) {
+        const { row, col } = state.selectedCell;
+        state.inputText = state.cells[row - 1][col - 1];
+      }
+    },
   },
 });
 
@@ -104,4 +126,7 @@ export const {
   moveCellLeft,
   moveCellRight,
   applyCell,
+  addColumns,
+  addRows,
+  copySelectedToInput,
 } = sheetSlice.actions;

@@ -14,6 +14,7 @@ import {
 
 function App() {
   const dispatch = useDispatch();
+
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
@@ -50,7 +51,7 @@ function App() {
     };
   }, []);
   return (
-    <div className="w-screen h-screen flex-col items-center bg-white">
+    <div className="w-screen h-screen flex-col flex items-center bg-white overflow-hidden">
       <Header />
       <Table />
     </div>

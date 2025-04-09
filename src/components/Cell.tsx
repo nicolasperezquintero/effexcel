@@ -32,6 +32,9 @@ const Cell = (props: { row: number; column: number }) => {
   }, [cells]);
 
   const calculateFormula = () => {
+    if (!content) {
+      return;
+    }
     if (!content.startsWith("=")) {
       setIsFormula(false);
       setError(false);
@@ -105,7 +108,7 @@ const Cell = (props: { row: number; column: number }) => {
     <td
       onClick={handleClick}
       className={
-        "border  text-black w-30 " +
+        "border  text-black max-w-30 w-30 whitespace-nowrap overflow-hidden " +
         (isSelected
           ? "border-2 border-green-600 shadow-inner"
           : "border-slate-300") +
