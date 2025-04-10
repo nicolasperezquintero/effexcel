@@ -1,46 +1,41 @@
 import { useDispatch, useSelector } from "react-redux";
 import { setSelectedCell } from "../store";
-import { useEffect, useState } from "react";
+import { useMemo } from "react";
 import { useConvert } from "../hooks/useConvert";
 
-const Cell = (props: { row: number; column: number }) => {
-  const { row, column } = props;
-  const [error, setError] = useState(false);
-  const [result, setResult] = useState("");
-  const [isFormula, setIsFormula] = useState(false);
+const Cell = (props: { row: number; column: number; content: string }) => {
+  const { row, column, content } = props;
   const regFormula = /(^\=([A-Z]+)\(([A-Z]+\d+)\,([A-Z]+\d+)\))$/;
 
   const { cellToNumber } = useConvert();
 
   const dispatch = useDispatch();
-  const content = useSelector((state: any) => {
-    return state.sheet.cells[row - 1][column - 1];
-  });
+
   const cells = useSelector((state: any) => {
     return state.sheet.cells;
   });
-  const selectedCell = useSelector((state: any) => {
-    return state.sheet.selectedCell;
+  const selected = useSelector((state: any) => {
+    return (
+      state.sheet.selectedCell?.row === row &&
+      state.sheet.selectedCell?.col === column
+    );
   });
 
-  const isSelected = selectedCell?.row === row && selectedCell?.col === column;
   const inputText = useSelector((state: any) => {
-    return state.sheet.inputText;
+    return selected ? state.sheet.inputText : null;
   });
-  useEffect(() => {
-    calculateFormula();
-  }, [cells]);
 
-  const calculateFormula = () => {
+  const calculateFormula = (): {
+    error: boolean;
+    isFormula: boolean;
+    result: string;
+  } => {
     if (!content) {
-      return;
+      return { error: false, isFormula: false, result: "" };
     }
     if (!content.startsWith("=")) {
-      setIsFormula(false);
-      setError(false);
-      return;
+      return { error: false, isFormula: false, result: "" };
     }
-    setIsFormula(true);
     let isValid = true;
     const formula = content.replace(" ", "");
     if (regFormula.test(formula)) {
@@ -57,13 +52,11 @@ const Cell = (props: { row: number; column: number }) => {
               const cellValue = cells[cell.row - 1][cell.col - 1];
               if (isNaN(Number(cellValue)) || cellValue === "") {
                 isValid = false;
-                setResult("");
                 return;
               }
               total += Number(cellValue);
             } else {
               isValid = false;
-              setResult("");
               return;
             }
           });
@@ -81,8 +74,6 @@ const Cell = (props: { row: number; column: number }) => {
             cell2 === ""
           ) {
             isValid = false;
-            setResult("");
-            return;
           }
           total = Number(cell1) - Number(cell2);
 
@@ -91,14 +82,17 @@ const Cell = (props: { row: number; column: number }) => {
           isValid = false;
           break;
       }
-      setResult(total.toString());
+      return { error: !isValid, isFormula: true, result: total.toString() };
     } else {
-      isValid = false;
+      return { error: true, isFormula: true, result: "" };
     }
-    setError(!isValid);
 
-    return;
+    //return;
   };
+  const { error, isFormula, result } = useMemo(() => {
+    return calculateFormula();
+    //HACE QUE CALCULATE DEVUELVA EL OBJETO
+  }, [content, cells]);
 
   const handleClick = () => {
     dispatch(setSelectedCell({ row, col: column }));
@@ -109,19 +103,13 @@ const Cell = (props: { row: number; column: number }) => {
       onClick={handleClick}
       className={
         "border  text-black max-w-30 w-30 whitespace-nowrap overflow-hidden " +
-        (isSelected
+        (selected
           ? "border-2 border-green-600 shadow-inner"
           : "border-slate-300") +
         (error ? " bg-red-200" : " bg-white")
       }
     >
-      {isSelected
-        ? inputText
-        : isFormula
-        ? error
-          ? "#ERROR"
-          : result
-        : content}
+      {selected ? inputText : isFormula ? (error ? "#ERROR" : result) : content}
     </td>
   );
 };

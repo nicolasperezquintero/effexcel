@@ -1,7 +1,7 @@
 import { useDispatch, useSelector } from "react-redux";
 import { useConvert } from "../hooks/useConvert";
 import Cell from "./Cell";
-import { BaseSyntheticEvent } from "react";
+import React, { BaseSyntheticEvent, useMemo } from "react";
 import { addColumns, addRows } from "../store";
 
 const Table = () => {
@@ -25,6 +25,28 @@ const Table = () => {
       dispatch(addColumns());
     }
   };
+  const renderedCells = useMemo(
+    () =>
+      cells.map((row: any, rowIndex: number) => (
+        <tr key={rowIndex}>
+          <th className="border border-gray-400 text-gray-700 bg-gray-300 sticky left-0 w-20 text-center">
+            {rowIndex + 1}
+          </th>
+          {row.map((content: any, colIndex: number) => {
+            console.log("Rerendering cell");
+            return (
+              <Cell
+                key={numberToLetter(colIndex) + rowIndex.toString()}
+                row={rowIndex + 1}
+                column={colIndex + 1}
+                content={content}
+              />
+            );
+          })}
+        </tr>
+      )),
+    [cells]
+  );
   return (
     <div
       className="max-w-screen flex-grow-1 overflow-auto"
@@ -47,27 +69,10 @@ const Table = () => {
             ))}
           </tr>
         </thead>
-        <tbody>
-          {cells.map((row: any, rowIndex: number) => (
-            <tr key={rowIndex}>
-              <th className="border border-gray-400 text-gray-700 bg-gray-300 sticky left-0 w-20 text-center">
-                {rowIndex + 1}
-              </th>
-              {row.map((_: any, colIndex: number) => {
-                return (
-                  <Cell
-                    key={numberToLetter(colIndex) + rowIndex.toString()}
-                    row={rowIndex + 1}
-                    column={colIndex + 1}
-                  />
-                );
-              })}
-            </tr>
-          ))}
-        </tbody>
+        <tbody>{renderedCells}</tbody>
       </table>
     </div>
   );
 };
 
-export default Table;
+export default React.memo(Table);

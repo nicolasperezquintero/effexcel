@@ -100,7 +100,7 @@ const sheetSlice = createSlice({
     },
     addRows(state) {
       const newCells = state.cells;
-      for (let i = 0; i < 5; i++) {
+      for (let i = 0; i < 20; i++) {
         newCells.push(Array(state.cells[0].length).fill(""));
       }
       state.cells = newCells;

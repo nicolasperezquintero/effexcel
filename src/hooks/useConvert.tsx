@@ -37,7 +37,7 @@ export const useConvert = () => {
       const row = parseInt(number[0]);
       return { row, col };
     }
-    return null;
+    return { row: 0, col: 0 };
   };
 
   return {

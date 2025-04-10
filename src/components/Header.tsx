@@ -5,10 +5,12 @@ import {
   copySelectedToInput,
   setInputText,
 } from "../store";
-import { useEffect, useMemo, useRef } from "react";
+import { ReactNode, useEffect, useMemo, useRef } from "react";
 import "../styles/Header.css";
+import { useConvert } from "../hooks/useConvert";
 
 const Header = () => {
+  const { numberToCell } = useConvert();
   const inputText = useSelector((state: any) => {
     return state.sheet.inputText;
   });
@@ -143,7 +145,9 @@ const Header = () => {
             e.stopPropagation();
           }}
         >
-          <h5 className="font-semibold mr-3">Editar Celda: </h5>
+          <h5 className="font-semibold mr-3">
+            Editar Celda {selectedCell ? numberToCell(selectedCell) : ""}
+          </h5>
           <input
             type="text"
             value={inputText}
