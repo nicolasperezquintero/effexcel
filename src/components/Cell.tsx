@@ -2,6 +2,7 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   addCellToFormula,
   applyCell,
+  clearSelection,
   setInputText,
   setSelectedCell,
   setSelectingCell,
@@ -139,10 +140,22 @@ const Cell = (props: { row: number; column: number; content: string }) => {
       dispatch(setSelectedCell({ row, col: column }));
     }
   };
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLTableCellElement>) => {
+    if (event.key === "Enter") {
+      dispatch(applyCell());
+      dispatch(clearSelection());
+      return;
+    }
+    if (event.key === "Escape") {
+      dispatch(clearSelection());
+      return;
+    }
+  };
 
   return (
     <td
       onMouseDown={handleClick}
+      onKeyDown={handleKeyDown}
       className={
         "border  text-black max-w-30 w-30 whitespace-nowrap overflow-hidden " +
         (selected
