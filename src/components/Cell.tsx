@@ -6,7 +6,7 @@ import {
   setSelectedCell,
   setSelectingCell,
 } from "../store";
-import { MouseEventHandler, SyntheticEvent, useEffect, useMemo } from "react";
+import { SyntheticEvent, useEffect, useMemo } from "react";
 import { useConvert } from "../hooks/useConvert";
 
 const Cell = (props: { row: number; column: number; content: string }) => {
