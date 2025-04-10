@@ -5,7 +5,7 @@ import {
   copySelectedToInput,
   setInputText,
 } from "../store";
-import { ReactNode, useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import "../styles/Header.css";
 import { useConvert } from "../hooks/useConvert";
 
