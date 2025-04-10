@@ -3,6 +3,7 @@ import {
   addCellToFormula,
   applyCell,
   clearSelection,
+  freeArrows,
   setInputText,
   setSelectedCell,
   setSelectingCell,
@@ -132,6 +133,7 @@ const Cell = (props: { row: number; column: number; content: string }) => {
   }, [content, cells]);
 
   const handleClick = (e: SyntheticEvent) => {
+    dispatch(freeArrows());
     if (selectingCell) {
       e.preventDefault();
       dispatch(addCellToFormula({ row, col: column }));

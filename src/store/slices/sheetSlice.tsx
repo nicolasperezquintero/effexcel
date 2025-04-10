@@ -8,7 +8,7 @@ interface Sheet {
     col: number;
   } | null;
   inputText: string;
-  inputRef: React.RefObject<HTMLInputElement> | null;
+  allowArrows: boolean;
   selectingCell: boolean;
 }
 
@@ -28,7 +28,7 @@ const initialState: Sheet = {
   cells: generateInitialCells(),
   selectedCell: null,
   inputText: "",
-  inputRef: null,
+  allowArrows: true,
   selectingCell: false,
 };
 const { numberToCell } = useConvert();
@@ -57,9 +57,6 @@ const sheetSlice = createSlice({
     clearSelection(state) {
       state.selectedCell = null;
       state.inputText = "";
-    },
-    setInputRef(state, action) {
-      state.inputRef = action.payload;
     },
     moveCellUp(state) {
       if (state.selectedCell) {
@@ -123,6 +120,12 @@ const sheetSlice = createSlice({
       const cell = action.payload;
       state.inputText += numberToCell(cell);
     },
+    captureArrows(state) {
+      state.allowArrows = false;
+    },
+    freeArrows(state) {
+      state.allowArrows = true;
+    },
   },
 });
 
@@ -132,7 +135,6 @@ export const {
   setSelectedCell,
   setInputText,
   clearSelection,
-  setInputRef,
   moveCellUp,
   moveCellDown,
   moveCellLeft,
@@ -143,4 +145,6 @@ export const {
   copySelectedToInput,
   setSelectingCell,
   addCellToFormula,
+  captureArrows,
+  freeArrows,
 } = sheetSlice.actions;

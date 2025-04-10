@@ -1,6 +1,7 @@
 import { useDispatch, useSelector } from "react-redux";
 import {
   applyCell,
+  captureArrows,
   clearSelection,
   copySelectedToInput,
   setInputText,
@@ -37,6 +38,9 @@ const Header = () => {
       dispatch(clearSelection());
       return;
     }
+  };
+  const handleClick = () => {
+    dispatch(captureArrows());
   };
   return (
     <div
@@ -153,6 +157,7 @@ const Header = () => {
             value={inputText}
             onChange={handleInputChange}
             onKeyDown={handleKeyDown}
+            onClick={handleClick}
             className="rounded bg-white text-black pl-1"
             ref={inputRef}
             disabled={!isSelectedCell}

@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import "./App.css";
 import Header from "./components/Header";
 import Table from "./components/Table";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import {
   applyCell,
   clearSelection,
@@ -14,7 +14,9 @@ import {
 
 function App() {
   const dispatch = useDispatch();
-
+  const allowArrows = useSelector((state: any) => {
+    return state.sheet.allowArrows;
+  });
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
@@ -22,25 +24,27 @@ function App() {
         dispatch(clearSelection());
         return;
       }
-      if (event.key === "ArrowDown") {
-        dispatch(applyCell());
-        dispatch(moveCellDown());
-        return;
-      }
-      if (event.key === "ArrowLeft") {
-        dispatch(applyCell());
-        dispatch(moveCellLeft());
-        return;
-      }
-      if (event.key === "ArrowRight") {
-        dispatch(applyCell());
-        dispatch(moveCellRight());
-        return;
-      }
-      if (event.key === "ArrowUp") {
-        dispatch(applyCell());
-        dispatch(moveCellUp());
-        return;
+      if (allowArrows) {
+        if (event.key === "ArrowDown") {
+          dispatch(applyCell());
+          dispatch(moveCellDown());
+          return;
+        }
+        if (event.key === "ArrowLeft") {
+          dispatch(applyCell());
+          dispatch(moveCellLeft());
+          return;
+        }
+        if (event.key === "ArrowRight") {
+          dispatch(applyCell());
+          dispatch(moveCellRight());
+          return;
+        }
+        if (event.key === "ArrowUp") {
+          dispatch(applyCell());
+          dispatch(moveCellUp());
+          return;
+        }
       }
     };
 
@@ -49,7 +53,7 @@ function App() {
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, []);
+  }, [allowArrows]);
   return (
     <div className="w-screen h-screen flex-col flex items-center bg-white overflow-hidden">
       <Header />

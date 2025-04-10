@@ -14,6 +14,8 @@ import sheetReducer, {
   copySelectedToInput,
   setSelectingCell,
   addCellToFormula,
+  captureArrows,
+  freeArrows,
 } from "./slices/sheetSlice";
 
 const store = configureStore({
@@ -37,4 +39,6 @@ export {
   copySelectedToInput,
   setSelectingCell,
   addCellToFormula,
+  captureArrows,
+  freeArrows,
 };
