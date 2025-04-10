@@ -1,11 +1,11 @@
 import { useDispatch, useSelector } from "react-redux";
-import { setSelectedCell } from "../store";
+import { applyCell, setSelectedCell } from "../store";
 import { useMemo } from "react";
 import { useConvert } from "../hooks/useConvert";
 
 const Cell = (props: { row: number; column: number; content: string }) => {
   const { row, column, content } = props;
-  const regFormula = /(^\=([A-Z]+)\(([A-Z]+\d+)\,([A-Z]+\d+)\))$/;
+  const regFormula = /(^\=([A-Z]+)\((([A-Z]+\d+)|\d+)\,(([A-Z]+\d+)|\d+)\))$/;
 
   const { cellToNumber } = useConvert();
 
@@ -37,7 +37,7 @@ const Cell = (props: { row: number; column: number; content: string }) => {
       return { error: false, isFormula: false, result: "" };
     }
     let isValid = true;
-    const formula = content.replace(" ", "");
+    const formula = content.replace(" ", "").toUpperCase();
     if (regFormula.test(formula)) {
       const funcion = formula.slice(1, formula.indexOf("("));
       const params = formula
@@ -47,32 +47,44 @@ const Cell = (props: { row: number; column: number; content: string }) => {
       switch (funcion) {
         case "SUMA":
           params.forEach((param: string) => {
-            const cell = cellToNumber(param);
-            if (cell) {
-              const cellValue = cells[cell.row - 1][cell.col - 1];
-              if (isNaN(Number(cellValue)) || cellValue === "") {
+            if (/^\d+$/.test(param)) {
+              //es numero
+              total += Number(param);
+            } else {
+              const cell = cellToNumber(param);
+              if (cell) {
+                const cellValue = cells[cell.row - 1][cell.col - 1];
+                if (isNaN(Number(cellValue || "0"))) {
+                  isValid = false;
+                  return;
+                }
+                total += Number(cellValue);
+              } else {
                 isValid = false;
                 return;
               }
-              total += Number(cellValue);
-            } else {
-              isValid = false;
-              return;
             }
           });
           break;
         case "RESTA":
           const cellsNumbers = params.map((param: string) => {
-            return cellToNumber(param);
+            if (/^\d+$/.test(param)) {
+              //es numero
+              return Number(param);
+            } else {
+              return cellToNumber(param);
+            }
           });
-          const cell1 = cells[cellsNumbers[0].row - 1][cellsNumbers[0].col - 1];
-          const cell2 = cells[cellsNumbers[1].row - 1][cellsNumbers[1].col - 1];
-          if (
-            isNaN(Number(cell1)) ||
-            cell1 === "" ||
-            isNaN(Number(cell2)) ||
-            cell2 === ""
-          ) {
+
+          const cell1 =
+            typeof cellsNumbers[0] === "number"
+              ? cellsNumbers[0]
+              : cells[cellsNumbers[0].row - 1][cellsNumbers[0].col - 1];
+          const cell2 =
+            typeof cellsNumbers[1] === "number"
+              ? cellsNumbers[1]
+              : cells[cellsNumbers[1].row - 1][cellsNumbers[1].col - 1];
+          if (isNaN(Number(cell1 || "0")) || isNaN(Number(cell2 || "0"))) {
             isValid = false;
           }
           total = Number(cell1) - Number(cell2);
@@ -95,6 +107,7 @@ const Cell = (props: { row: number; column: number; content: string }) => {
   }, [content, cells]);
 
   const handleClick = () => {
+    dispatch(applyCell());
     dispatch(setSelectedCell({ row, col: column }));
   };
 
