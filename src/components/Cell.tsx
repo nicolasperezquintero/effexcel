@@ -1,6 +1,12 @@
 import { useDispatch, useSelector } from "react-redux";
-import { applyCell, setSelectedCell } from "../store";
-import { useMemo } from "react";
+import {
+  addCellToFormula,
+  applyCell,
+  setInputText,
+  setSelectedCell,
+  setSelectingCell,
+} from "../store";
+import { MouseEventHandler, SyntheticEvent, useEffect, useMemo } from "react";
 import { useConvert } from "../hooks/useConvert";
 
 const Cell = (props: { row: number; column: number; content: string }) => {
@@ -20,10 +26,28 @@ const Cell = (props: { row: number; column: number; content: string }) => {
       state.sheet.selectedCell?.col === column
     );
   });
+  const selectingCell = useSelector((state: any) => {
+    return state.sheet.selectingCell;
+  });
 
   const inputText = useSelector((state: any) => {
     return selected ? state.sheet.inputText : null;
   });
+  useEffect(() => {
+    if (selected) {
+      if (
+        selected &&
+        (/^=[A-Za-z]+\($/.test(inputText.replaceAll(" ", "")) ||
+          /^=[A-Za-z]+\((([A-Za-z]+\d+)|\d+)\,$/.test(
+            inputText.replaceAll(" ", "")
+          ))
+      ) {
+        dispatch(setSelectingCell(true));
+      } else {
+        dispatch(setSelectingCell(false));
+      }
+    }
+  }, [inputText, selected]);
 
   const calculateFormula = (): {
     error: boolean;
@@ -37,7 +61,7 @@ const Cell = (props: { row: number; column: number; content: string }) => {
       return { error: false, isFormula: false, result: "" };
     }
     let isValid = true;
-    const formula = content.replace(" ", "").toUpperCase();
+    const formula = content.replace(/\s/g, "").toUpperCase();
     if (regFormula.test(formula)) {
       const funcion = formula.slice(1, formula.indexOf("("));
       const params = formula
@@ -106,14 +130,19 @@ const Cell = (props: { row: number; column: number; content: string }) => {
     //HACE QUE CALCULATE DEVUELVA EL OBJETO
   }, [content, cells]);
 
-  const handleClick = () => {
-    dispatch(applyCell());
-    dispatch(setSelectedCell({ row, col: column }));
+  const handleClick = (e: SyntheticEvent) => {
+    if (selectingCell) {
+      e.preventDefault();
+      dispatch(addCellToFormula({ row, col: column }));
+    } else if (!selected) {
+      dispatch(applyCell());
+      dispatch(setSelectedCell({ row, col: column }));
+    }
   };
 
   return (
     <td
-      onClick={handleClick}
+      onMouseDown={handleClick}
       className={
         "border  text-black max-w-30 w-30 whitespace-nowrap overflow-hidden " +
         (selected
@@ -122,7 +151,24 @@ const Cell = (props: { row: number; column: number; content: string }) => {
         (error ? " bg-red-200" : " bg-white")
       }
     >
-      {selected ? inputText : isFormula ? (error ? "#ERROR" : result) : content}
+      {selected ? (
+        <input
+          type="text"
+          className="rounded"
+          value={inputText}
+          onChange={(e) => {
+            dispatch(setInputText(e.target.value));
+          }}
+        />
+      ) : isFormula ? (
+        error ? (
+          "#ERROR"
+        ) : (
+          result
+        )
+      ) : (
+        content
+      )}
     </td>
   );
 };

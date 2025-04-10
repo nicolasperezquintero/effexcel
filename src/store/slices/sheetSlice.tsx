@@ -1,4 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
+import { useConvert } from "../../hooks/useConvert";
 
 interface Sheet {
   cells: string[][];
@@ -8,6 +9,7 @@ interface Sheet {
   } | null;
   inputText: string;
   inputRef: React.RefObject<HTMLInputElement> | null;
+  selectingCell: boolean;
 }
 
 const generateInitialCells = () => {
@@ -27,7 +29,9 @@ const initialState: Sheet = {
   selectedCell: null,
   inputText: "",
   inputRef: null,
+  selectingCell: false,
 };
+const { numberToCell } = useConvert();
 
 const sheetSlice = createSlice({
   name: "sheet",
@@ -111,6 +115,14 @@ const sheetSlice = createSlice({
         state.inputText = state.cells[row - 1][col - 1];
       }
     },
+    setSelectingCell(state, action) {
+      const selectingCell = action.payload;
+      state.selectingCell = selectingCell;
+    },
+    addCellToFormula(state, action) {
+      const cell = action.payload;
+      state.inputText += numberToCell(cell);
+    },
   },
 });
 
@@ -129,4 +141,6 @@ export const {
   addColumns,
   addRows,
   copySelectedToInput,
+  setSelectingCell,
+  addCellToFormula,
 } = sheetSlice.actions;

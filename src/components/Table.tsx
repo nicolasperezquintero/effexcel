@@ -33,7 +33,6 @@ const Table = () => {
             {rowIndex + 1}
           </th>
           {row.map((content: any, colIndex: number) => {
-            console.log("Rerendering cell");
             return (
               <Cell
                 key={numberToLetter(colIndex) + rowIndex.toString()}
