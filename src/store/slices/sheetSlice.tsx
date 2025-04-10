@@ -118,7 +118,8 @@ const sheetSlice = createSlice({
     },
     addCellToFormula(state, action) {
       const cell = action.payload;
-      state.inputText += numberToCell(cell);
+      state.inputText +=
+        numberToCell(cell) + (state.inputText.endsWith(",") ? ")" : ",");
     },
     captureArrows(state) {
       state.allowArrows = false;
