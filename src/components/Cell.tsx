@@ -41,7 +41,7 @@ const Cell = (props: { row: number; column: number; content: string }) => {
       if (
         selected &&
         (/^=[A-Za-z]+\($/.test(inputText.replaceAll(" ", "")) ||
-          /^=[A-Za-z]+\((([A-Za-z]+\d+)|\-{0,1}\d+)\,$/.test(
+          /^=[A-Za-z]+\((([A-Za-z]+\d+)|\-{0,1}\d+(\.\d+){0,1})\,$/.test(
             inputText.replaceAll(" ", "")
           ))
       ) {
@@ -76,7 +76,6 @@ const Cell = (props: { row: number; column: number; content: string }) => {
       let total = 0;
       switch (funcion) {
         case "SUMA":
-          console.log(Number("-10.3"));
           params.forEach((param: string) => {
             if (/^\-{0,1}\d+(\.\d+){0,1}$/.test(param)) {
               //es numero
