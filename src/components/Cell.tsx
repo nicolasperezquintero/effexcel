@@ -14,7 +14,7 @@ import { useConvert } from "../hooks/useConvert";
 const Cell = (props: { row: number; column: number; content: string }) => {
   const { row, column, content } = props;
   const regFormula =
-    /(^\=([A-Z]+)\((([A-Z]+\d+)|\-{0,1}\d+)\,(([A-Z]+\d+)|\-{0,1}\d+)\))$/;
+    /(^\=([A-Z]+)\((([A-Z]+\d+)|\-{0,1}\d+(\.\d+){0,1})\,(([A-Z]+\d+)|\-{0,1}\d+(\.\d+){0,1})\))$/;
 
   const { cellToNumber } = useConvert();
 
@@ -76,8 +76,9 @@ const Cell = (props: { row: number; column: number; content: string }) => {
       let total = 0;
       switch (funcion) {
         case "SUMA":
+          console.log(Number("-10.3"));
           params.forEach((param: string) => {
-            if (/^\-{0,1}\d+$/.test(param)) {
+            if (/^\-{0,1}\d+(\.\d+){0,1}$/.test(param)) {
               //es numero
               total += Number(param);
             } else {
@@ -119,7 +120,7 @@ const Cell = (props: { row: number; column: number; content: string }) => {
           break;
         case "RESTA":
           const cellsNumbers = params.map((param: string) => {
-            if (/^\-{0,1}\d+$/.test(param)) {
+            if (/^\-{0,1}\d+(\.\d+){0,1}$/.test(param)) {
               //PERMITIR NEGATIVOS
               //es numero
               return parseFloat(param);
